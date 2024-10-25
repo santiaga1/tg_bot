@@ -1,5 +1,6 @@
 bot_test.py
 *.db
+test123.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

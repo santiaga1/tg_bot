@@ -1,46 +1,40 @@
 import sqlite3
 
-# Connect to DB
-connection = sqlite3.connect('database.db')
-cursor = connection.cursor()
+class DB_Connect:
+    def __init__(self):
+        # Connect to DB
+        self.connection = sqlite3.connect('database.db')
+        self.cursor = self.connection.cursor()
 
-# Create table Tasks if not exists
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS Tasks (
-id INTEGER PRIMARY KEY,
-task TEXT NOT NULL,
-name TEXT NOT NULL,
-time TEXT NOT NULL
-)
-''')
+        # Create table Tasks if not exists
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Tasks (
+            id INTEGER PRIMARY KEY,
+            task TEXT NOT NULL,
+            name TEXT NOT NULL,
+            time TEXT NOT NULL
+        )
+        ''')
+        
+        # Save changes and close connections
+        self.connection.commit()
 
-# Save changes and close connections
-connection.commit()
-connection.close()
+    # View tasks
+    def view_tasks(self):
+        self.cursor.execute('SELECT * FROM Tasks')
+        tasks = self.cursor.fetchall()
+        return tasks
 
-# View tasks
-def view_tasks():
-    connection = sqlite3.connect('database.db')
-    cursor = connection.cursor()
-    cursor.execute('SELECT * FROM Tasks')
-    tasks = cursor.fetchall()
-    connection.close()
-    return tasks
+    # Add new task
+    def add_new_task(self, task, name, time):
+        self.cursor.execute('INSERT INTO Tasks (task, name, time) VALUES (?, ?, ?)', (task, name, time))
+        self.connection.commit()
 
-# Add new task
-def add_new_task(task, name, time):
-    connection = sqlite3.connect('database.db')
-    cursor = connection.cursor()
-    cursor.execute('INSERT INTO Tasks (task, name, time) VALUES (?, ?, ?)', (task, name, time))
-    connection.commit()
-    connection.close()
+    # Delete task
+    def del_task(self, id):
+        self.cursor.execute('DELETE FROM Tasks WHERE id = ?', (id,))
+        self.connection.commit()
 
-
-
-#cursor.execute('UPDATE Users SET age = ? WHERE username = ?', (29, 'newuser'))
-
-#cursor.execute('DELETE FROM Users WHERE username = ?', ('newuser',))
-
-#cursor.execute('INSERT INTO Tasks (task, name, time) VALUES (?, ?, ?)', ("Test task", "Test Name", "31.12"))
-
-#cursor.execute('INSERT INTO Tasks (task, name, time) VALUES (?, ?, ?)', ("Test task2", "Test Name2", "31.10"))
+    def __del__(self):
+        self.connection.close()
+        #print("Close DB")
