@@ -3,9 +3,9 @@ from aiogram.filters import Command
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery, InlineQuery, ReplyKeyboardRemove
 
-from keyboards.simple_row import make_row_keyboard
+from keyboards.simple_row import create_inline_kb
 
 
 router = Router()
@@ -14,28 +14,31 @@ router = Router()
 @router.message(Command(commands=["start"]))
 async def cmd_start(message: Message, state: FSMContext):
     await state.clear()
-    available_actions = ["Управление событиями ⏰", "Другие действия ⭐", "Отмена ❌"]
+    available_actions = [
+        ["Управление событиями ⏰", "manage_tasks"],
+        ["Другие действия ⭐", "other"],
+        ["Отмена ❌", "cancel"]
+    ]
     await message.answer(
         text="Выберите, что хотите сделать: ",
-        reply_markup=make_row_keyboard(available_actions)
+        reply_markup=create_inline_kb(2, available_actions)
     )
-
 
 # Cancel actions
-@router.message(StateFilter(None), Command(commands=["cancel"]))
-@router.message(default_state, F.text.lower() == "отмена ❌")
-async def cmd_cancel_no_state(message: Message, state: FSMContext):
+@router.callback_query(StateFilter(None), F.data == "cancel")
+async def cmd_cancel_no_state(callback: CallbackQuery, state: FSMContext):
     await state.set_data({})
-    await message.answer(
-        text="Действие отменено",
-        reply_markup=ReplyKeyboardRemove()
+    await callback.message.edit_text(
+        text='Работа с ботом завершена,\r\nдля возврата к боту нажмите /start',
+        reply_markup=None
     )
+    await callback.answer()
 
-@router.message(Command(commands=["cancel"]))
-@router.message(F.text.lower() == "отмена ❌")
-async def cmd_cancel(message: Message, state: FSMContext):
+@router.callback_query(F.data == "cancel")
+async def cmd_cancel(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await message.answer(
-        text="Действие отменено",
-        reply_markup=ReplyKeyboardRemove()
+    await callback.message.edit_text(
+        text='Работа с ботом завершена,\r\nдля возврата к боту нажмите /start',
+        reply_markup=None
     )
+    await callback.answer()
