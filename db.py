@@ -35,6 +35,12 @@ class DB_Connect:
         self.cursor.execute('DELETE FROM Tasks WHERE id = ?', (id,))
         self.connection.commit()
 
+    # Today tasks
+    def today_tasks(self, time):
+        self.cursor.execute('SELECT * FROM Tasks WHERE time = ?', (time,))
+        tasks = self.cursor.fetchall()
+        return tasks
+
     def __del__(self):
         self.connection.close()
         #print("Close DB")
