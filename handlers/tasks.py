@@ -10,6 +10,14 @@ from db import DB_Connect
 
 import prettytable as pt
 
+# Function to wrap string by words
+def wrap_by_word(s, n):
+    a = s.split()
+    ret = ''
+    for i in range(0, len(a), n):
+        ret += ' '.join(a[i:i+n]) + '\n'
+
+    return ret
 
 # Create router object
 router = Router()
@@ -52,7 +60,7 @@ async def view_tasks(callback: CallbackQuery, state: FSMContext):
     table.align['Имя'] = 'r'
     table.align['Дата'] = 'r'
     for task in tasks_list:
-        table.add_row([task[0], task[1], task[2], task[3]])
+        table.add_row([task[0], wrap_by_word(task[1],3), task[2], task[3]])
     await callback.message.edit_text(
         f"Список событий:\r\n<pre>{table}</pre>",
         parse_mode=ParseMode.HTML,
