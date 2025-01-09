@@ -35,16 +35,17 @@ async def send_schedule():
     #print(tasks_list)
 
     for task in tasks_list:
-        if(re.search(r"день рожден", task[1].lower())):
-            schedule_message = "<b>🎉 Сегодня День Рождения у "+task[2]+"! 🎉\n\n🎁 Поздравляем! 🎁\n\n🍺 🍾 🍻 🍸 🍹</b>"
-        else:
-            if(task[2].trim()!=""):
-                schedule_message = "<b>✨ Сегодня "+task[1]+" у "+task[2]+"! ✨\n\n🎆 Поздравляем! 🎆</b>"
+        if(task[1].strip()!=""):
+            if(re.search(r"день рожден", task[1].lower())):
+                schedule_message = "<b>🎉 Сегодня День Рождения у "+task[2]+"! 🎉\n\n🎁 Поздравляем! 🎁\n\n🍺 🍾 🍻 🍸 🍹</b>"
             else:
-                schedule_message = "<b>📢 Сегодня "+task[1]+"! 📢</b>"
+                if(task[2].strip()!=""):
+                    schedule_message = "<b>✨ Сегодня "+task[1]+" у "+task[2]+"! ✨\n\n🎆 Поздравляем! 🎆</b>"
+                else:
+                    schedule_message = "<b>📢 Напоминание - "+task[1]+"! 📢</b>"
 
-        #print(schedule_message)
-        await bot.send_message(chat_id=config.group_id.get_secret_value(), text=schedule_message,  parse_mode=ParseMode.HTML)
+            #print(schedule_message)
+            await bot.send_message(chat_id=config.group_id.get_secret_value(), text=schedule_message,  parse_mode=ParseMode.HTML)
 
     await session.close()
 
